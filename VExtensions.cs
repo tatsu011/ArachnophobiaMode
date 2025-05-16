@@ -17,7 +17,7 @@ namespace ArachnophobiaMode
         {
             try
             {
-                Utils.Server.EntityManager.TryGetComponentData<PrefabGUID>(entity, out var componentData);
+                Utils.Server.EntityManager.TryGetComponentData<PrefabGUID>(entity, out PrefabGUID componentData);
                 return componentData.ToString()!.Equals(comparingvalue.ToString());
 
             }
@@ -35,6 +35,21 @@ namespace ArachnophobiaMode
             Utils.Server.EntityManager.TryGetComponentData<T>(entity, out T componentData);
             action(ref componentData);
             Utils.Server.EntityManager.SetComponentData<T>(entity, componentData);
+        }
+
+        public static bool SetEntityPrefab(this Entity entity, PrefabGUID target, PrefabGUID replacement)
+        {
+            try
+            {
+                Utils.Client.EntityManager.TryGetComponentData<PrefabGUID>(entity, out PrefabGUID componentData);
+
+            }
+            catch (Exception e)
+            {
+                _log.LogError("Could not swap data");
+                return false;
+            }
+            return true;
         }
 
         public delegate void ActionRefs<T>(ref T item);

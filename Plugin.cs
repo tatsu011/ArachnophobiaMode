@@ -2,6 +2,8 @@
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using ProjectM;
+using System.Reflection;
 
 namespace ArachnophobiaMode;
 
@@ -18,12 +20,15 @@ public class Plugin : BasePlugin
     {
         // Plugin startup logic
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} version {MyPluginInfo.PLUGIN_VERSION} is loaded!");
+        LogInstance = Log;
+        Settings.Initialize(Config);
+    }
 
-        // Harmony patching
-        _harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
-        _harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
-        
-
+    [HarmonyPatch(typeof(GameBootstrap), nameof(GameBootstrap.Start))]
+    public void OnGameInitialized()
+    {
+        _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
     }
 
     public override bool Unload()
